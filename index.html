@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Styling for the countdown container */
+        #countdown-container {
+            position: fixed; /* Sticks the timer to the top */
+            top: 0;
+            width: 100%;
+            background-color: #ff4d4d; /* Urgent red background color */
+            color: #fff;
+            text-align: center;
+            font-family: 'Arial Black', sans-serif;
+            padding: 15px 0;
+            z-index: 1000; /* Ensures the timer is always on top */
+            box-shadow: 0 4px 2px -2px gray; /* Adds a subtle shadow for emphasis */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Styling for the countdown timer */
+        #countdown {
+            font-size: 60px; /* Bigger and bolder font size */
+            font-weight: bold;
+            letter-spacing: 2px; /* Adds space between the numbers */
+        }
+
+        /* Styling for the text next to the countdown */
+        #text-right {
+            font-size: 60px; /* Matching the timer's font size */
+            font-weight: bold;
+            letter-spacing: 2px; /* Matching the letter spacing */
+            margin-left: 20px; /* Space between the countdown and the text */
+        }
+
+        /* Media query for smaller screens */
+        @media (max-width: 768px) {
+            #countdown {
+                font-size: 40px; /* Smaller font size for the countdown */
+            }
+
+            #text-right {
+                font-size: 40px; /* Smaller font size for the text */
+                margin-left: 10px; /* Smaller margin on mobile */
+            }
+
+            #countdown-container {
+                flex-direction: column; /* Stack items vertically on smaller screens */
+                padding: 10px 0; /* Adjust padding for smaller screens */
+            }
+        }
+
+        /* Media query for very small screens (e.g., phones) */
+        @media (max-width: 480px) {
+            #countdown-container {
+                flex-direction: column; /* Stack items vertically */
+                align-items: center; /* Center items */
+                padding: 8px 0; /* Less padding for smaller screens */
+            }
+
+            #text-right {
+                font-size: 20px; /* Even smaller font size for the text */
+                margin-left: 0; /* Remove margin */
+                margin-bottom: 5px; /* Add some space below the text */
+            }
+
+            #countdown {
+                font-size: 30px; /* Smaller font size for the countdown */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header section -->
+    <header>
+        <div id="countdown-container">
+            <div id="text-right">⚡️50% off ends in...</div>
+            <div id="countdown">04:00:00</div>
+        </div>
+    </header>
+
+    <script>
+        // Function to get or set the countdown end time in localStorage
+        function getOrSetCountdownTime() {
+            const storedEndTime = localStorage.getItem('countdownEndTime');
+            if (storedEndTime) {
+                return parseInt(storedEndTime, 10);
+            } else {
+                const endTime = new Date().getTime() + 4 * 60 * 60 * 1000; // 4 hours from now
+                localStorage.setItem('countdownEndTime', endTime);
+                return endTime;
+            }
+        }
+
+        // Set the countdown time
+        const countdownTime = getOrSetCountdownTime();
+
+        // Update the countdown every 1 second
+        const x = setInterval(function() {
+
+            // Get today's date and time
+            const now = new Date().getTime();
+
+            // Find the distance between now and the countdown time
+            const distance = countdownTime - now;
+
+            // Time calculations for hours, minutes, and seconds
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result in the element with id="countdown"
+            document.getElementById("countdown").innerHTML =
+                ("0" + hours).slice(-2) + ":" +
+                ("0" + minutes).slice(-2) + ":" +
+                ("0" + seconds).slice(-2);
+
+            // If the countdown is over, display expired message
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("countdown").innerHTML = "SALE ENDED";
+                document.getElementById("text-right").innerHTML = "The Sale Has Ended";
+                document.getElementById("countdown-container").style.backgroundColor = "#333";
+                localStorage.removeItem('countdownEndTime'); // Remove the end time once the sale has ended
+            }
+        }, 1000);
+    </script>
+
+</body>
+</html>
